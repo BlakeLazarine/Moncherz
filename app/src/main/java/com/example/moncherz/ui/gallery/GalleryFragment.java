@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -58,11 +59,6 @@ public class GalleryFragment extends Fragment {
                     urlConnection.disconnect();
                 }
 
-                // read each line and write to System.out
-
-
-
-
             }
         });
 
@@ -75,18 +71,32 @@ public class GalleryFragment extends Fragment {
                 ViewModelProviders.of(this).get(GalleryViewModel.class);
         View root = inflater.inflate(R.layout.fragment_gallery, container, false);
         final TextView textView = root.findViewById(R.id.text_gallery);
+        final LinearLayout linLay = root.findViewById(R.id.linLay);
+
+        for(int i = 0; i < 100; i++) {
+            TextView f = new TextView(this.getContext());
+            f.setText("hi");
+            linLay.addView(f);
+        }
+
         galleryViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
+
             }
         });
+
+
+
         try {
             Log.d("RAWR ", "RAWWWWR");
             grabData();
         } catch (IOException e) {
             Log.d("BIGBADERROR: ", "dhjasklhfjaskl");
         }
+
+
 
         return root;
     }
