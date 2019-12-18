@@ -1,6 +1,7 @@
 package com.example.moncherz.ui.gallery;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,32 +34,73 @@ public class GalleryFragment extends Fragment {
 
     public void grabData() throws IOException {
 
+        HttpURLConnection urlConnection = null;
+        HttpURLConnection conn = null;
+        URL url = new URL("http://menu.dining.ucla.edu/Menus/DeNeve/2019-12-11/Breakfast");
+        urlConnection = (HttpURLConnection) url.openConnection();
+
+        InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+
+        final BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        final ArrayList<String> names = new ArrayList<String>();
+        final ArrayList<Integer> sectIdx = new ArrayList<Integer>();
+        final ArrayList<String> sectNames = new ArrayList<String>();
+
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            String foodPattern = ".*recipelink\" href=\"http.*\">(.*)<.*";
+
+            Pattern r = Pattern.compile(foodPattern);
+            Matcher m = r.matcher(line);
+            if (m.matches()) {
+                names.add(m.group(1));
+                continue;
+            }
+            String sectionPattern = ".*<li class=\"sect-item\">.*";
+            Pattern p = Pattern.compile(sectionPattern);
+            Matcher mat = p.matcher(line);
+            if (mat.matches()) {
+                line = br.readLine();
+                sectIdx.add(names.size());
+                sectNames.add(line.trim());
+            }
+        }
+        urlConnection.disconnect();
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //code to do the HTTP request
-                HttpURLConnection urlConnection = null;
-                try {
-                    HttpURLConnection conn = null;
-                    URL url = new URL("http://menu.dining.ucla.edu/Menus/Covel/Yesterday/Lunch");
-                    urlConnection = (HttpURLConnection) url.openConnection();
+            //code to do the HTTP request
 
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            GalleryFragment.this.getActivity().runOnUiThread(new Runnable() {
 
-                    BufferedReader br = new BufferedReader(new InputStreamReader(in));
-                    String line = null;
-                    while ((line = br.readLine()) != null) {
-                        String pattern = ".*recipelink\".*\">(.*)<.*";
-                        Pattern r = Pattern.compile(pattern);
-                        Matcher m = r.matcher(line);
-                        if (m.matches())
-                            Log.d("FOOD: ", m.group(1));
+                @Override
+                public void run() {
+                    LinearLayout linLay = GalleryFragment.this.getView().findViewById(R.id.linLay);
+                    int nextSect = 0;
+                    for(int i = 0; i < names.size(); i++) {
+
+                        if(i == sectIdx.get(nextSect)) {
+                            TextView sect = new TextView(GalleryFragment.this.getContext());
+                            sect.setText(sectNames.get(nextSect));
+                            sect.setTextSize(36);
+                            sect.setTextColor(0xFF008577);
+                            if(nextSect < sectNames.size() - 1)
+                                nextSect++;
+                            linLay.addView(sect);
+                        }
+                        TextView f = new TextView(GalleryFragment.this.getContext());
+                        String s = "<p>" + names.get(i) + "</p>";
+                        f.setText(Html.fromHtml(s));
+//                            f.setText("" + sectIdx.get(0));
+                        f.setTextSize(24);
+                        f.setSingleLine();
+
+//                            f.setHeight(linLay.getHeight()/20);
+                        linLay.addView(f);
                     }
-                } catch (IOException e) {
-                    Log.d("test: ", e.toString());
-                } finally {
-                    urlConnection.disconnect();
                 }
+            });
 
             }
         });
@@ -70,32 +113,33 @@ public class GalleryFragment extends Fragment {
         galleryViewModel =
                 ViewModelProviders.of(this).get(GalleryViewModel.class);
         View root = inflater.inflate(R.layout.fragment_gallery, container, false);
-        final TextView textView = root.findViewById(R.id.text_gallery);
-        final LinearLayout linLay = root.findViewById(R.id.linLay);
 
-        for(int i = 0; i < 100; i++) {
-            TextView f = new TextView(this.getContext());
-            f.setText("hi");
-            linLay.addView(f);
-        }
+
 
         galleryViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s);
+//                textView.setText(s);
 
             }
         });
 
 
+        class PrimeThread extends Thread {
 
-        try {
-            Log.d("RAWR ", "RAWWWWR");
-            grabData();
-        } catch (IOException e) {
-            Log.d("BIGBADERROR: ", "dhjasklhfjaskl");
+            public void run() {
+                try {
+                    Log.d("RAWR ", "RAWWWWR");
+                    grabData();
+                } catch (IOException e) {
+                    Log.d("BIGBADERROR: ", "dhjasklhfjaskl");
+                }
+            }
         }
 
+
+        PrimeThread pt = new PrimeThread();
+        pt.start();
 
 
         return root;
