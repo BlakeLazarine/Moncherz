@@ -1,12 +1,18 @@
 package com.example.moncherz;
 
+import android.content.Context;
+import android.text.Html;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,6 +36,14 @@ public class Utilities {
     public static ArrayList<String>[][] foods = new ArrayList[numPlaces][numTimes];
     public static ArrayList<Integer>[][] sectIdx = new ArrayList[numPlaces][numTimes];
     public static ArrayList<String>[][] sectNames = new ArrayList[numPlaces][numTimes];
+
+    public static ArrayList<String> favs = new ArrayList<>();
+
+    public static class Status {
+        public String updateDate;
+        //This is where notification settings and stuff like that will go
+    }
+    public static Status stats;
 
     public static Boolean done = false;
 
@@ -56,7 +70,8 @@ public class Utilities {
                     Pattern r = Pattern.compile(foodPattern);
                     Matcher m = r.matcher(line);
                     if (m.matches()) {
-                        foods[p][t].add(m.group(1));
+                        String s = "<p>" + m.group(1) + "</p>";
+                        foods[p][t].add(Html.fromHtml(s).toString().trim());
                         continue;
                     }
                     String sectionPattern = ".*<li class=\"sect-item\">.*";
@@ -74,4 +89,105 @@ public class Utilities {
 
         done = true;
     }
+
+    private static class Menu {
+        public ArrayList<String>[][] f;
+        public ArrayList<Integer>[][] i;
+        public ArrayList<String>[][] n;
+    }
+
+    public static void saveMenu(Context context) {
+
+        Menu m = new Menu();
+        m.f = foods;
+        m.i = sectIdx;
+        m.n = sectNames;
+        try {
+            FileOutputStream fos = context.openFileOutput("TodayMenu", Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(m);
+            os.close();
+            fos.close();
+        } catch(Exception e) {
+        }
+    }
+
+    public static void loadMenu(Context context) {
+        try {
+            FileInputStream fis = context.openFileInput("TodayMenu");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            Menu m = (Menu) is.readObject();
+            is.close();
+            fis.close();
+            foods = m.f;
+            sectIdx = m.i;
+            sectNames = m.n;
+        } catch(Exception e) {
+
+        }
+    }
+    public static void removeFav(String s, Context context) {
+        if(favs.contains(s)) {
+            favs.remove(s);
+            try {
+                FileOutputStream fos = context.openFileOutput("Favorites", Context.MODE_PRIVATE);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(favs);
+                os.close();
+                fos.close();
+            } catch(Exception e) {
+            }
+        }
+    }
+
+    public static void addFav(String s, Context context) {
+        if(!favs.contains(s)) {
+            favs.add(s);
+            try {
+                FileOutputStream fos = context.openFileOutput("Favorites", Context.MODE_PRIVATE);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(favs);
+                os.close();
+                fos.close();
+            } catch(Exception e) {
+            }
+        }
+    }
+
+    public static void loadFavs(Context context) {
+        try {
+            FileInputStream fis = context.openFileInput("TodayMenu");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            ArrayList<String> f = (ArrayList<String>) is.readObject();
+            is.close();
+            fis.close();
+            favs = f;
+        } catch(Exception e) {
+
+        }
+    }
+
+    public static void saveStatus(Context context) {
+        try {
+            FileOutputStream fos = context.openFileOutput("TodayMenu", Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(stats);
+            os.close();
+            fos.close();
+        } catch(Exception e) {
+        }
+    }
+
+    public static void loadStatus(Context context) {
+        try {
+            FileInputStream fis = context.openFileInput("TodayMenu");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            stats = (Status) is.readObject();
+            is.close();
+            fis.close();
+        } catch(Exception e) {
+
+        }
+    }
+
 }

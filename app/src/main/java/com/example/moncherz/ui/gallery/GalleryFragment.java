@@ -1,11 +1,14 @@
 package com.example.moncherz.ui.gallery;
 
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -89,6 +92,11 @@ public class GalleryFragment extends Fragment {
                                 nextSect++;
                             linLay.addView(sect);
                         }
+
+                        LinearLayout line = new LinearLayout(GalleryFragment.this.getContext());
+                        line.setOrientation(LinearLayout.HORIZONTAL);
+
+
                         TextView f = new TextView(GalleryFragment.this.getContext());
                         String s = "<p>" + names.get(i) + "</p>";
                         f.setText(Html.fromHtml(s));
@@ -96,8 +104,27 @@ public class GalleryFragment extends Fragment {
                         f.setTextSize(24);
                         f.setSingleLine();
 
+
+                        ImageButton b = new ImageButton(GalleryFragment.this.getContext());
+                        b.setImageResource(R.drawable.star);
+                        b.setBackgroundColor(0);
+
+//                        b.setBottom(f.getBottom());
+                        b.setTop(f.getTop());
+                        if(f.getHeight() < b.getHeight()) {
+                            f.setHeight(b.getHeight());
+                            f.setGravity(Gravity.CENTER_VERTICAL);
+                        }
+
+
+
 //                            f.setHeight(linLay.getHeight()/20);
-                        linLay.addView(f);
+                        line.addView(b);
+                        line.addView(f);
+
+                        linLay.addView(line);
+
+
                     }
                 }
             });
