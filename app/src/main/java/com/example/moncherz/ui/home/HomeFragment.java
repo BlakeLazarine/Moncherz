@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class HomeFragment extends Fragment {
 
@@ -43,44 +45,6 @@ public class HomeFragment extends Fragment {
                     }
                 }
                 final String files[] = HomeFragment.this.getContext().fileList();
-                if(files.length == 0) {
-                    try {
-                        FileOutputStream fos = HomeFragment.this.getContext().openFileOutput("favorites", HomeFragment.this.getContext().MODE_PRIVATE);
-                        String msg = "Yummies";
-                        fos.write(msg.getBytes());
-
-                    } catch(Exception e) {
-
-                    }
-                }
-
-                StringBuilder stringBuilder = new StringBuilder();
-                final String contents;
-                try {
-                    FileInputStream fis = HomeFragment.this.getContext().openFileInput("favorites");
-                    InputStreamReader inputStreamReader =
-                            new InputStreamReader(fis);
-
-                    BufferedReader reader = new BufferedReader(inputStreamReader);
-                    String line = reader.readLine();
-                    while (line != null) {
-                        stringBuilder.append(line).append('\n');
-                        line = reader.readLine();
-                    }
-
-                } catch (IOException e) {
-                    // Error occurred when opening raw file for reading.
-                } finally {
-                    contents = stringBuilder.toString();
-                }
-                try {
-                    FileOutputStream fos = HomeFragment.this.getContext().openFileOutput("favorites", HomeFragment.this.getContext().MODE_APPEND);
-                    String msg = "heyhey";
-                    fos.write(msg.getBytes());
-
-                } catch(Exception e) {
-
-                }
 
                 HomeFragment.this.getActivity().runOnUiThread(new Runnable() {
 
@@ -89,7 +53,7 @@ public class HomeFragment extends Fragment {
                         LinearLayout favLinLay = HomeFragment.this.getView().findViewById(R.id.FavLinLay);
                         TextView t = new TextView(HomeFragment.this.getContext());
 
-                        t.setText(contents + "");
+                        t.setText(files[0] + " " + files[1] + " " + files.length);
                         favLinLay.addView(t);
 
                     }

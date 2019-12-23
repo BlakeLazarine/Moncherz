@@ -1,24 +1,16 @@
 package com.example.moncherz;
 
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.text.Html;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.example.moncherz.ui.gallery.GalleryFragment;
 
 import java.util.ArrayList;
 
@@ -105,13 +97,11 @@ public class MenuFragment extends Fragment {
                                 public void onClick(View v) {
                                     if (!pressed) {
                                         b.setColorFilter(0xffebe534);
-                                        if(!Utilities.favs.contains(f.getText().toString()))
-                                            Utilities.favs.add(f.getText().toString());
+                                        Utilities.addFav(f.getText().toString(), MenuFragment.this.getContext());
                                         pressed = true;
                                     } else {
                                         b.setColorFilter(0xffa8a8a8);
-                                        if(Utilities.favs.contains(f.getText().toString()))
-                                            Utilities.favs.remove(f.getText().toString());
+                                        Utilities.removeFav(f.getText().toString(), MenuFragment.this.getContext());
                                         pressed = false;
                                     }
 

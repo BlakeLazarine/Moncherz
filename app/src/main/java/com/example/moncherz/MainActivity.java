@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
             public void run() {
                 try {
-                    Utilities.grabData();
+                    Utilities.startUp(MainActivity.this);
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.d("BIGBADERROR: ", "Could not Grab Data");
                 }
             }

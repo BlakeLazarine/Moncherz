@@ -1,4 +1,4 @@
-package com.example.moncherz.ui.gallery;
+package com.example.moncherz.ui.BPlate;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

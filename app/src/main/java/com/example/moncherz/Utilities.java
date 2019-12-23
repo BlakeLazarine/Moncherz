@@ -15,7 +15,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,17 +39,18 @@ public class Utilities {
     public static ArrayList<Integer>[][] sectIdx = new ArrayList[numPlaces][numTimes];
     public static ArrayList<String>[][] sectNames = new ArrayList[numPlaces][numTimes];
 
-    public static ArrayList<String> favs = new ArrayList<>();
+    public static ArrayList<String> favs;
 
-    public static class Status {
+    public static class Status implements java.io.Serializable{
         public String updateDate;
+        public Boolean loaded;
         //This is where notification settings and stuff like that will go
     }
     public static Status stats;
 
     public static Boolean done = false;
 
-    public static void grabData() throws IOException {
+    public static void grabData(String date) throws IOException {
         for (int p = 0; p < numPlaces; p++) {
             for (int t = 0; t < numTimes; t++) {
                 foods[p][t] = new ArrayList<String>();
@@ -55,7 +58,7 @@ public class Utilities {
                 sectNames[p][t] = new ArrayList<String>();
                 HttpURLConnection urlConnection = null;
                 HttpURLConnection conn = null;
-                URL url = new URL("http://menu.dining.ucla.edu/Menus/" + placeNames[p] + "/2019-12-11/" + timeNames[t]);
+                URL url = new URL("http://menu.dining.ucla.edu/Menus/" + placeNames[p] + "/" + date + "/" + timeNames[t]);
                 urlConnection = (HttpURLConnection) url.openConnection();
 
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -86,11 +89,9 @@ public class Utilities {
                 urlConnection.disconnect();
             }
         }
-
-        done = true;
     }
 
-    private static class Menu {
+    private static class Menu implements java.io.Serializable{
         public ArrayList<String>[][] f;
         public ArrayList<Integer>[][] i;
         public ArrayList<String>[][] n;
@@ -156,7 +157,7 @@ public class Utilities {
 
     public static void loadFavs(Context context) {
         try {
-            FileInputStream fis = context.openFileInput("TodayMenu");
+            FileInputStream fis = context.openFileInput("Favorites");
             ObjectInputStream is = new ObjectInputStream(fis);
             ArrayList<String> f = (ArrayList<String>) is.readObject();
             is.close();
@@ -169,7 +170,7 @@ public class Utilities {
 
     public static void saveStatus(Context context) {
         try {
-            FileOutputStream fos = context.openFileOutput("TodayMenu", Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput("Stats", Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(stats);
             os.close();
@@ -180,14 +181,95 @@ public class Utilities {
 
     public static void loadStatus(Context context) {
         try {
-            FileInputStream fis = context.openFileInput("TodayMenu");
+            FileInputStream fis = context.openFileInput("Stats");
             ObjectInputStream is = new ObjectInputStream(fis);
             stats = (Status) is.readObject();
             is.close();
             fis.close();
         } catch(Exception e) {
+            Log.d("MESSAGE", e.toString());
 
         }
     }
 
+    public static void startUp(Context context) {
+        final String files[] = context.fileList();
+        Boolean hasStats = false;
+        Boolean hasFavs = false;
+        for (int i = 0; i < files.length; i++) {
+//            Log.d("MESSAGE", "HERE" + files[i]);
+            if(files[i].equals("Stats"))
+//                Log.d("MESSAGE", "HERE2");
+                hasStats = true;
+            if(files[i].equals("Favorites"))
+//                Log.d("MESSAGE", "HERE3");
+                hasFavs = true;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = "2019-12-11";//sdf.format(new Date());
+        //HEY YOU, YOU SHOULD UNCOMMENT THAT LINE ABOVE THIS ONE. IMA MAKE THIS REAL OBNOXIOUS
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        if(hasStats) {
+
+
+            loadStatus(context);
+            /*
+
+
+
+
+
+            Im having problems with loadStatus right now
+
+
+
+             */
+            Log.d("MESSAGE", "HEY NOW IM OVER HERE");
+            stats.loaded = true;
+            Log.d("MESSAGE", "HEY IM RIGHT HERE");
+            if(stats.updateDate.equals(currentDate)) {
+
+                Log.d("MESSAGE", "WOAOOAOAOHAHAHOHAHAHOAH");
+                loadMenu(context);
+                Log.d("MESSAGE", "WOAOOAOAOHAHAHOHAHAHOAH");
+            } else {
+                try {
+                    grabData(currentDate);
+                    saveMenu(context);
+                    stats.updateDate = currentDate;
+                } catch(Exception e) {
+
+                }
+            }
+        } else {
+            stats = new Status();
+            stats.loaded = false;
+            try {
+                grabData(currentDate);
+                saveMenu(context);
+                stats.updateDate = currentDate;
+                saveStatus(context);
+            } catch(Exception e) {
+
+            }
+        }
+
+        if(hasFavs) {
+            loadFavs(context);
+        } else {
+            favs = new ArrayList<>();
+        }
+
+        done = true;
+    }
 }

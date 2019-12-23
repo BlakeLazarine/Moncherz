@@ -1,6 +1,5 @@
-package com.example.moncherz.ui.gallery;
+package com.example.moncherz.ui.BPlate;
 
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -31,7 +30,7 @@ import java.util.regex.Pattern;
 
 import com.example.moncherz.R;
 
-public class GalleryFragment extends Fragment {
+public class BPlateFragment extends Fragment {
 
     private GalleryViewModel galleryViewModel;
 
@@ -75,16 +74,16 @@ public class GalleryFragment extends Fragment {
             public void run() {
             //code to do the HTTP request
 
-            GalleryFragment.this.getActivity().runOnUiThread(new Runnable() {
+            BPlateFragment.this.getActivity().runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    LinearLayout linLay = GalleryFragment.this.getView().findViewById(R.id.linLay);
+                    LinearLayout linLay = BPlateFragment.this.getView().findViewById(R.id.linLay);
                     int nextSect = 0;
                     for(int i = 0; i < names.size(); i++) {
 
                         if(i == sectIdx.get(nextSect)) {
-                            TextView sect = new TextView(GalleryFragment.this.getContext());
+                            TextView sect = new TextView(BPlateFragment.this.getContext());
                             sect.setText(sectNames.get(nextSect));
                             sect.setTextSize(36);
                             sect.setTextColor(0xFF008577);
@@ -93,11 +92,11 @@ public class GalleryFragment extends Fragment {
                             linLay.addView(sect);
                         }
 
-                        LinearLayout line = new LinearLayout(GalleryFragment.this.getContext());
+                        LinearLayout line = new LinearLayout(BPlateFragment.this.getContext());
                         line.setOrientation(LinearLayout.HORIZONTAL);
 
 
-                        TextView f = new TextView(GalleryFragment.this.getContext());
+                        TextView f = new TextView(BPlateFragment.this.getContext());
                         String s = "<p>" + names.get(i) + "</p>";
                         f.setText(Html.fromHtml(s));
 //                            f.setText("" + sectIdx.get(0));
@@ -105,7 +104,7 @@ public class GalleryFragment extends Fragment {
                         f.setSingleLine();
 
 
-                        ImageButton b = new ImageButton(GalleryFragment.this.getContext());
+                        ImageButton b = new ImageButton(BPlateFragment.this.getContext());
                         b.setImageResource(R.drawable.star);
                         b.setBackgroundColor(0);
 
