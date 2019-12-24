@@ -67,7 +67,8 @@ public class MenuFragment extends Fragment {
                         if(foods.size() == 0) {
                             TextView ohno = new TextView(MenuFragment.this.getContext());
                             TextView t = new TextView(MenuFragment.this.getContext());
-                            t.setText("No " + Utilities.timeNames[time] + " today :(");
+                            String msg = "No " + Utilities.timeNames[time] + " today :(";
+                            t.setText(msg);
                             t.setTextSize(30);
                             linLay.addView(t);
                         }
@@ -89,7 +90,7 @@ public class MenuFragment extends Fragment {
                             b.setImageResource(R.drawable.star);
                             b.setBackgroundColor(0);
 
-                            final Boolean isFav = Utilities.favs.contains(foods.get(i));
+                            final boolean isFav = Utilities.favs.contains(foods.get(i));
                             if(isFav)
                                 b.setColorFilter(0xffebe534);
                             else
@@ -99,7 +100,7 @@ public class MenuFragment extends Fragment {
                             f.setTextSize(24);
 
                             View.OnClickListener click = new View.OnClickListener() {
-                                Boolean pressed = isFav;
+                                boolean pressed = isFav;
 
                                 public void onClick(View v) {
                                     if (!pressed) {

@@ -44,15 +44,15 @@ public class Utilities {
 
     public static class Status implements java.io.Serializable{
         public String updateDate;
-        public Boolean loaded;
+        public boolean loaded;
         //This is where notification settings and stuff like that will go
     }
     public static Status stats;
 
-    public static Boolean done = false;
+    public static boolean done = false;
 
     //binary search method heavily heavily based on https://www.javatpoint.com/binary-search-in-java
-    public static Boolean binarySearch(ArrayList<String> arr, String key){
+    public static boolean binarySearch(ArrayList<String> arr, String key){
         int first = 0;
         int last = arr.size()-1;
         int mid = (first + last)/2;
@@ -220,8 +220,8 @@ public class Utilities {
 
     public static void startUp(Context context) {
         final String files[] = context.fileList();
-        Boolean hasStats = false;
-        Boolean hasFavs = false;
+        boolean hasStats = false;
+        boolean hasFavs = false;
         for (int i = 0; i < files.length; i++) {
 //            Log.d("MESSAGE", "HERE" + files[i]);
             if(files[i].equals("Stats"))
@@ -247,27 +247,10 @@ public class Utilities {
         //**************************************************************************************
         if(hasStats) {
 
-
             loadStatus(context);
-            /*
-
-
-
-
-
-            Im having problems with loadStatus right now
-
-
-
-             */
-            Log.d("MESSAGE", "HEY NOW IM OVER HERE");
             stats.loaded = true;
-            Log.d("MESSAGE", "HEY IM RIGHT HERE");
             if(stats.updateDate.equals(currentDate)) {
-
-                Log.d("MESSAGE", "WOAOOAOAOHAHAHOHAHAHOAH");
                 loadMenu(context);
-                Log.d("MESSAGE", "WOAOOAOAOHAHAHOHAHAHOAH");
             } else {
                 try {
                     grabData(currentDate);
