@@ -17,17 +17,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utilities {
-    public static final int numPlaces = 1;
+    public static final int numPlaces = 4;
     public static final int BPlate = 0;
     public static final int Covel = 1;
     public static final int DeNeve = 2;
     public static final int Feast = 3;
-    public static final String[] placeNames = {"BruinPlate", "Covel", "DeNeve", "Feast"};
+    public static final String[] placeHumanNames = {"BPlate", "Covel", "DeNeve", "Feast"};
+    public static final String[] placeURLNames = {"BruinPlate", "Covel", "DeNeve", "FeastAtRieber"};
 
     public static final int numTimes = 3;
     public static final int Breakfast = 0;
@@ -50,6 +51,29 @@ public class Utilities {
 
     public static Boolean done = false;
 
+    //binary search method heavily heavily based on https://www.javatpoint.com/binary-search-in-java
+    public static Boolean binarySearch(ArrayList<String> arr, String key){
+        int first = 0;
+        int last = arr.size()-1;
+        int mid = (first + last)/2;
+        if(last == -1)
+            return false;
+        while( first <= last ){
+            if ( arr.get(mid).compareTo(key) < 0){
+                first = mid + 1;
+            }else if ( arr.get(mid).equals(key) ){
+                return true;
+            }else{
+                last = mid - 1;
+            }
+            mid = (first + last)/2;
+        }
+        if ( first > last ){
+            return false;
+        }
+        return true;
+    }
+
     public static void grabData(String date) throws IOException {
         for (int p = 0; p < numPlaces; p++) {
             for (int t = 0; t < numTimes; t++) {
@@ -58,7 +82,7 @@ public class Utilities {
                 sectNames[p][t] = new ArrayList<String>();
                 HttpURLConnection urlConnection = null;
                 HttpURLConnection conn = null;
-                URL url = new URL("http://menu.dining.ucla.edu/Menus/" + placeNames[p] + "/" + date + "/" + timeNames[t]);
+                URL url = new URL("http://menu.dining.ucla.edu/Menus/" + placeURLNames[p] + "/" + date + "/" + timeNames[t]);
                 urlConnection = (HttpURLConnection) url.openConnection();
 
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -128,7 +152,7 @@ public class Utilities {
         }
     }
     public static void removeFav(String s, Context context) {
-        if(favs.contains(s)) {
+        if(binarySearch(favs, s)) {
             favs.remove(s);
             try {
                 FileOutputStream fos = context.openFileOutput("Favorites", Context.MODE_PRIVATE);
@@ -142,8 +166,9 @@ public class Utilities {
     }
 
     public static void addFav(String s, Context context) {
-        if(!favs.contains(s)) {
+        if(!binarySearch(favs, s)) {
             favs.add(s);
+            Collections.sort(favs);
             try {
                 FileOutputStream fos = context.openFileOutput("Favorites", Context.MODE_PRIVATE);
                 ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -163,6 +188,7 @@ public class Utilities {
             is.close();
             fis.close();
             favs = f;
+
         } catch(Exception e) {
 
         }

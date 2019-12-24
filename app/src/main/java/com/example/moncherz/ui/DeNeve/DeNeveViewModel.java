@@ -1,16 +1,16 @@
-package com.example.moncherz.ui.BPlate;
+package com.example.moncherz.ui.DeNeve;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel {
+public class DeNeveViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public GalleryViewModel() {
+    public DeNeveViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is gallery fragment");
+        mText.setValue("This is tools fragment");
     }
 
     public LiveData<String> getText() {

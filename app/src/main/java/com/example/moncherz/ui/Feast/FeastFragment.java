@@ -1,4 +1,4 @@
-package com.example.moncherz.ui.slideshow;
+package com.example.moncherz.ui.Feast;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,17 +15,17 @@ import com.google.android.material.tabs.TabLayout;
 import com.example.moncherz.MenuAdapter;
 import com.example.moncherz.Utilities;
 
-public class SlideshowFragment extends Fragment {
+public class FeastFragment extends Fragment {
 
-    private SlideshowViewModel slideshowViewModel;
+    private FeastViewModel slideshowViewModel;
     MenuAdapter mAdapter;
     ViewPager mPager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         slideshowViewModel =
-                ViewModelProviders.of(this).get(SlideshowViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_slideshow, container, false);
+                ViewModelProviders.of(this).get(FeastViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_covel, container, false);
 //        final TextView textView = root.findViewById(R.id.text_slideshow);
 //        slideshowViewModel.getText().observe(this, new Observer<String>() {
 //            @Override
@@ -34,7 +34,7 @@ public class SlideshowFragment extends Fragment {
 //            }
 //        });
 
-        mAdapter = new MenuAdapter(this.getActivity().getSupportFragmentManager(), Utilities.BPlate);
+        mAdapter = new MenuAdapter(this.getActivity().getSupportFragmentManager(), Utilities.Feast);
         mPager = root.findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
 

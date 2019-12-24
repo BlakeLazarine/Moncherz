@@ -64,6 +64,13 @@ public class MenuFragment extends Fragment {
                         ArrayList<Integer> sectIdx = Utilities.sectIdx[place][time];
                         ArrayList<String> sectNames = Utilities.sectNames[place][time];
 
+                        if(foods.size() == 0) {
+                            TextView ohno = new TextView(MenuFragment.this.getContext());
+                            TextView t = new TextView(MenuFragment.this.getContext());
+                            t.setText("No " + Utilities.timeNames[time] + " today :(");
+                            t.setTextSize(30);
+                            linLay.addView(t);
+                        }
                         for (int i = 0; i < foods.size(); i++) {
 
                             if (i == sectIdx.get(nextSect)) {

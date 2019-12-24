@@ -1,4 +1,4 @@
-package com.example.moncherz.ui.BPlate;
+package com.example.moncherz.ui.DeNeve;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,16 +15,16 @@ import com.google.android.material.tabs.TabLayout;
 import com.example.moncherz.MenuAdapter;
 import com.example.moncherz.Utilities;
 
-public class BPlateFragment extends Fragment {
+public class DeNeveFragment extends Fragment {
 
-    private BPlateViewModel slideshowViewModel;
+    private DeNeveViewModel slideshowViewModel;
     MenuAdapter mAdapter;
     ViewPager mPager;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         slideshowViewModel =
-                ViewModelProviders.of(this).get(BPlateViewModel.class);
+                ViewModelProviders.of(this).get(DeNeveViewModel.class);
         View root = inflater.inflate(R.layout.fragment_covel, container, false);
 //        final TextView textView = root.findViewById(R.id.text_slideshow);
 //        slideshowViewModel.getText().observe(this, new Observer<String>() {
@@ -34,7 +34,7 @@ public class BPlateFragment extends Fragment {
 //            }
 //        });
 
-        mAdapter = new MenuAdapter(this.getActivity().getSupportFragmentManager(), Utilities.BPlate);
+        mAdapter = new MenuAdapter(this.getActivity().getSupportFragmentManager(), Utilities.DeNeve);
         mPager = root.findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
 

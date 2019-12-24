@@ -8,10 +8,10 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">BPlate</string>
-    <string name="menu_tools">Tools</string>
-    <string name="menu_share">Share</string>
+    <string name="menu_bplate">BPlate</string>
+    <string name="menu_covel">Covel</string>
+    <string name="menu_deneve">DeNeve</string>
+    <string name="menu_feast">Feast</string>
     <string name="menu_send">Send</string>
 
     <!-- TODO: Remove or change this placeholder text -->
