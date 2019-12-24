@@ -1,6 +1,8 @@
 package com.example.moncherz;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.Html;
 import android.util.Log;
 
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.content.ContentValues.TAG;
 
 public class Utilities {
     public static final int numPlaces = 4;
@@ -50,6 +54,7 @@ public class Utilities {
     public static Status stats;
 
     public static boolean done = false;
+    public static boolean badInternet = false;
 
     //binary search method heavily heavily based on https://www.javatpoint.com/binary-search-in-java
     public static boolean binarySearch(ArrayList<String> arr, String key){
@@ -72,6 +77,37 @@ public class Utilities {
             return false;
         }
         return true;
+    }
+
+
+    //the 2 network checking methods are straight-up from this stackoverflow page
+    //https://stackoverflow.com/questions/6493517/detect-if-android-device-has-internet-connection/25816086#25816086
+    private static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
+
+    public static boolean hasInternetAccess(Context context) {
+        if (isNetworkAvailable(context)) {
+            try {
+                HttpURLConnection urlc = (HttpURLConnection)
+                        (new URL("http://clients3.google.com/generate_204")
+                                .openConnection());
+                urlc.setRequestProperty("User-Agent", "Android");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(1500);
+                urlc.connect();
+                return (urlc.getResponseCode() == 204 &&
+                        urlc.getContentLength() == 0);
+            } catch (IOException e) {
+                Log.e(TAG, "Error checking internet connection", e);
+            }
+        } else {
+            Log.d(TAG, "No network available!");
+        }
+        return false;
     }
 
     public static void grabData(String date) throws IOException {
@@ -253,9 +289,14 @@ public class Utilities {
                 loadMenu(context);
             } else {
                 try {
-                    grabData(currentDate);
-                    saveMenu(context);
-                    stats.updateDate = currentDate;
+                    if(hasInternetAccess(context)) {
+                        grabData(currentDate);
+                        saveMenu(context);
+                        stats.updateDate = currentDate;
+                    } else {
+                        badInternet = true;
+                    }
+
                 } catch(Exception e) {
 
                 }
@@ -264,10 +305,15 @@ public class Utilities {
             stats = new Status();
             stats.loaded = false;
             try {
-                grabData(currentDate);
-                saveMenu(context);
-                stats.updateDate = currentDate;
-                saveStatus(context);
+                if(hasInternetAccess(context)) {
+                    grabData(currentDate);
+                    saveMenu(context);
+                    stats.updateDate = currentDate;
+                    saveStatus(context);
+                } else {
+                    badInternet = true;
+                }
+
             } catch(Exception e) {
 
             }

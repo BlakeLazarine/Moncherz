@@ -26,7 +26,6 @@ public class MenuFragment extends Fragment {
     }
 
 
-
     private int place;
     private int time;
 
@@ -63,81 +62,86 @@ public class MenuFragment extends Fragment {
                         ArrayList<String> foods = Utilities.foods[place][time];
                         ArrayList<Integer> sectIdx = Utilities.sectIdx[place][time];
                         ArrayList<String> sectNames = Utilities.sectNames[place][time];
-
-                        if(foods.size() == 0) {
-                            TextView ohno = new TextView(MenuFragment.this.getContext());
+                        if (Utilities.badInternet) {
                             TextView t = new TextView(MenuFragment.this.getContext());
-                            String msg = "No " + Utilities.timeNames[time] + " today :(";
-                            t.setText(msg);
+                            t.setText("No Internet Owo");
                             t.setTextSize(30);
                             linLay.addView(t);
-                        }
-                        for (int i = 0; i < foods.size(); i++) {
-
-                            if (i == sectIdx.get(nextSect)) {
-                                TextView sect = new TextView(MenuFragment.this.getContext());
-                                sect.setText(sectNames.get(nextSect));
-                                sect.setTextSize(36);
-                                sect.setTextColor(0xFF008577);
-                                if (nextSect < sectNames.size() - 1)
-                                    nextSect++;
-                                linLay.addView(sect);
+                        } else {
+                            if (foods.size() == 0) {
+                                TextView ohno = new TextView(MenuFragment.this.getContext());
+                                TextView t = new TextView(MenuFragment.this.getContext());
+                                String msg = "No " + Utilities.timeNames[time] + " today :(";
+                                t.setText(msg);
+                                t.setTextSize(30);
+                                linLay.addView(t);
                             }
+                            for (int i = 0; i < foods.size(); i++) {
 
-                            LinearLayout line = new LinearLayout(MenuFragment.this.getContext());
-                            line.setOrientation(LinearLayout.HORIZONTAL);
-                            final ImageButton b = new ImageButton(MenuFragment.this.getContext());
-                            b.setImageResource(R.drawable.star);
-                            b.setBackgroundColor(0);
-
-                            final boolean isFav = Utilities.favs.contains(foods.get(i));
-                            if(isFav)
-                                b.setColorFilter(0xffebe534);
-                            else
-                                b.setColorFilter(0xffa8a8a8);
-
-                            final TextView f = new TextView(MenuFragment.this.getContext());
-                            f.setTextSize(24);
-
-                            View.OnClickListener click = new View.OnClickListener() {
-                                boolean pressed = isFav;
-
-                                public void onClick(View v) {
-                                    if (!pressed) {
-                                        b.setColorFilter(0xffebe534);
-                                        Utilities.addFav(f.getText().toString(), MenuFragment.this.getContext());
-                                        pressed = true;
-                                    } else {
-                                        b.setColorFilter(0xffa8a8a8);
-                                        Utilities.removeFav(f.getText().toString(), MenuFragment.this.getContext());
-                                        pressed = false;
-                                    }
-
-
+                                if (i == sectIdx.get(nextSect)) {
+                                    TextView sect = new TextView(MenuFragment.this.getContext());
+                                    sect.setText(sectNames.get(nextSect));
+                                    sect.setTextSize(36);
+                                    sect.setTextColor(0xFF008577);
+                                    if (nextSect < sectNames.size() - 1)
+                                        nextSect++;
+                                    linLay.addView(sect);
                                 }
-                            };
-                            b.setOnClickListener(click);
+
+                                LinearLayout line = new LinearLayout(MenuFragment.this.getContext());
+                                line.setOrientation(LinearLayout.HORIZONTAL);
+                                final ImageButton b = new ImageButton(MenuFragment.this.getContext());
+                                b.setImageResource(R.drawable.star);
+                                b.setBackgroundColor(0);
+
+                                final boolean isFav = Utilities.favs.contains(foods.get(i));
+                                if (isFav)
+                                    b.setColorFilter(0xffebe534);
+                                else
+                                    b.setColorFilter(0xffa8a8a8);
+
+                                final TextView f = new TextView(MenuFragment.this.getContext());
+                                f.setTextSize(24);
+
+                                View.OnClickListener click = new View.OnClickListener() {
+                                    boolean pressed = isFav;
+
+                                    public void onClick(View v) {
+                                        if (!pressed) {
+                                            b.setColorFilter(0xffebe534);
+                                            Utilities.addFav(f.getText().toString(), MenuFragment.this.getContext());
+                                            pressed = true;
+                                        } else {
+                                            b.setColorFilter(0xffa8a8a8);
+                                            Utilities.removeFav(f.getText().toString(), MenuFragment.this.getContext());
+                                            pressed = false;
+                                        }
 
 
-                            f.setText(foods.get(i));
-                            line.addView(b);
-                            line.addView(f);
+                                    }
+                                };
+                                b.setOnClickListener(click);
+
+
+                                f.setText(foods.get(i));
+                                line.addView(b);
+                                line.addView(f);
 //                            line.setGravity(Gravity.CENTER_VERTICAL);
-                            linLay.addView(line);
+                                linLay.addView(line);
 
-                            b.setPadding(0,0,0,0);
-                            b.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                            f.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                            int diff = b.getMeasuredHeight() - f.getMeasuredHeight();
-                            if(diff > 0){
-                                f.setPadding(0,diff/2, 0, 0);
+                                b.setPadding(0, 0, 0, 0);
+                                b.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                                f.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                                int diff = b.getMeasuredHeight() - f.getMeasuredHeight();
+                                if (diff > 0) {
+                                    f.setPadding(0, diff / 2, 0, 0);
 
 //                                b.setPadding(b.getMeasuredWidth() / 10, 0, b.getMeasuredWidth() / 10, 0);
 //                                f.setText(diff + "");
-                            }
-                            else
-                                b.setPadding(0, Math.abs(diff/2), 0, 0);
+                                } else
+                                    b.setPadding(0, Math.abs(diff / 2), 0, 0);
 
+                            }
                         }
                     }
                 });
