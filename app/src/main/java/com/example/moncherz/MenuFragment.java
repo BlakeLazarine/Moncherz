@@ -68,14 +68,13 @@ public class MenuFragment extends Fragment {
                             t.setTextSize(30);
                             linLay.addView(t);
                         } else {
-                            if (foods.size() == 0) {
-                                TextView ohno = new TextView(MenuFragment.this.getContext());
-                                TextView t = new TextView(MenuFragment.this.getContext());
-                                String msg = "No " + Utilities.timeNames[time] + " today :(";
-                                t.setText(msg);
-                                t.setTextSize(30);
-                                linLay.addView(t);
-                            }
+
+                            TextView t = new TextView(MenuFragment.this.getContext());
+                            String msg = Utilities.hours[place][time];
+                            t.setText(msg);
+                            t.setTextSize(30);
+                            linLay.addView(t);
+
                             for (int i = 0; i < foods.size(); i++) {
 
                                 if (i == sectIdx.get(nextSect)) {

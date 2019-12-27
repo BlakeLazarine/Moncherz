@@ -32,51 +32,50 @@ public class Utilities {
     public static final int DeNeve = 2;
     public static final int Feast = 3;
     public static final String[] placeHumanNames = {"BPlate", "Covel", "DeNeve", "Feast"};
-    public static final String[] placeURLNames = {"BruinPlate", "Covel", "DeNeve", "FeastAtRieber"};
+    private static final String[] placeURLNames = {"BruinPlate", "Covel", "DeNeve", "FeastAtRieber"};
 
     public static final int numTimes = 3;
-    public static final int Breakfast = 0;
-    public static final int Lunch = 1;
-    public static final int Dinner = 2;
+    static final int Breakfast = 0;
+    static final int Lunch = 1;
+    static final int Dinner = 2;
     public static final String[] timeNames = {"Breakfast", "Lunch", "Dinner"};
 
-    public static ArrayList<String>[][] foods = new ArrayList[numPlaces][numTimes];
-    public static ArrayList<Integer>[][] sectIdx = new ArrayList[numPlaces][numTimes];
-    public static ArrayList<String>[][] sectNames = new ArrayList[numPlaces][numTimes];
+    public static ArrayList<String>[][] foods;
+    static ArrayList<Integer>[][] sectIdx;
+    static ArrayList<String>[][] sectNames;
+    public static String[][] hours;
 
     public static ArrayList<String> favs;
 
-    public static class Status implements java.io.Serializable{
-        public String updateDate;
-        public boolean loaded;
+    public static class Status implements java.io.Serializable {
+        String updateDate;
+        boolean loaded;
         //This is where notification settings and stuff like that will go
     }
-    public static Status stats;
+
+    private static Status stats;
 
     public static boolean done = false;
     public static boolean badInternet = false;
 
     //binary search method heavily heavily based on https://www.javatpoint.com/binary-search-in-java
-    public static boolean binarySearch(ArrayList<String> arr, String key){
+    public static boolean binarySearch(ArrayList<String> arr, String key) {
         int first = 0;
-        int last = arr.size()-1;
-        int mid = (first + last)/2;
-        if(last == -1)
+        int last = arr.size() - 1;
+        int mid = (first + last) / 2;
+        if (last == -1)
             return false;
-        while( first <= last ){
-            if ( arr.get(mid).compareTo(key) < 0){
+        while (first <= last) {
+            if (arr.get(mid).compareTo(key) < 0) {
                 first = mid + 1;
-            }else if ( arr.get(mid).equals(key) ){
+            } else if (arr.get(mid).equals(key)) {
                 return true;
-            }else{
+            } else {
                 last = mid - 1;
             }
-            mid = (first + last)/2;
+            mid = (first + last) / 2;
         }
-        if ( first > last ){
-            return false;
-        }
-        return true;
+        return false;
     }
 
 
@@ -89,7 +88,7 @@ public class Utilities {
         return activeNetworkInfo != null;
     }
 
-    public static boolean hasInternetAccess(Context context) {
+    private static boolean hasInternetAccess(Context context) {
         if (isNetworkAvailable(context)) {
             try {
                 HttpURLConnection urlc = (HttpURLConnection)
@@ -110,23 +109,24 @@ public class Utilities {
         return false;
     }
 
-    public static void grabData(String date) throws IOException {
+    private static void grabData(String date) throws IOException {
+        foods = new ArrayList[numPlaces][numTimes];
+        sectIdx = new ArrayList[numPlaces][numTimes];
+        sectNames = new ArrayList[numPlaces][numTimes];
         for (int p = 0; p < numPlaces; p++) {
             for (int t = 0; t < numTimes; t++) {
-                foods[p][t] = new ArrayList<String>();
-                sectIdx[p][t] = new ArrayList<Integer>();
-                sectNames[p][t] = new ArrayList<String>();
-                HttpURLConnection urlConnection = null;
-                HttpURLConnection conn = null;
+                foods[p][t] = new ArrayList<>();
+                sectIdx[p][t] = new ArrayList<>();
+                sectNames[p][t] = new ArrayList<>();
+                HttpURLConnection urlConnection;
                 URL url = new URL("http://menu.dining.ucla.edu/Menus/" + placeURLNames[p] + "/" + date + "/" + timeNames[t]);
                 urlConnection = (HttpURLConnection) url.openConnection();
 
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
                 final BufferedReader br = new BufferedReader(new InputStreamReader(in));
-                Log.d("YOYOYOOYOYYOYOYOYOYOYO", "IT GOT HERE DAWWWG");
 
-                String line = null;
+                String line;
                 while ((line = br.readLine()) != null) {
                     String foodPattern = ".*recipelink\" href=\"http.*\">(.*)<.*";
 
@@ -143,7 +143,8 @@ public class Utilities {
                     if (mat.matches()) {
                         line = br.readLine();
                         sectIdx[p][t].add(foods[p][t].size());
-                        sectNames[p][t].add(line.trim());
+                        String s = "<p>" + line + "</p>";
+                        sectNames[p][t].add(Html.fromHtml(s).toString().trim());
                     }
                 }
                 urlConnection.disconnect();
@@ -151,13 +152,13 @@ public class Utilities {
         }
     }
 
-    private static class Menu implements java.io.Serializable{
-        public ArrayList<String>[][] f;
-        public ArrayList<Integer>[][] i;
-        public ArrayList<String>[][] n;
+    private static class Menu implements java.io.Serializable {
+        ArrayList<String>[][] f;
+        ArrayList<Integer>[][] i;
+        ArrayList<String>[][] n;
     }
 
-    public static void saveMenu(Context context) {
+    private static void saveMenu(Context context) {
 
         Menu m = new Menu();
         m.f = foods;
@@ -169,11 +170,12 @@ public class Utilities {
             os.writeObject(m);
             os.close();
             fos.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
+            Log.d("MESSAGE", e.toString());
         }
     }
 
-    public static void loadMenu(Context context) {
+    private static void loadMenu(Context context) {
         try {
             FileInputStream fis = context.openFileInput("TodayMenu");
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -183,12 +185,13 @@ public class Utilities {
             foods = m.f;
             sectIdx = m.i;
             sectNames = m.n;
-        } catch(Exception e) {
-
+        } catch (Exception e) {
+            Log.d("MESSAGE", e.toString());
         }
     }
+
     public static void removeFav(String s, Context context) {
-        if(binarySearch(favs, s)) {
+        if (binarySearch(favs, s)) {
             favs.remove(s);
             try {
                 FileOutputStream fos = context.openFileOutput("Favorites", Context.MODE_PRIVATE);
@@ -196,13 +199,14 @@ public class Utilities {
                 os.writeObject(favs);
                 os.close();
                 fos.close();
-            } catch(Exception e) {
+            } catch (Exception e) {
+                Log.d("MESSAGE", e.toString());
             }
         }
     }
 
     public static void addFav(String s, Context context) {
-        if(!binarySearch(favs, s)) {
+        if (!binarySearch(favs, s)) {
             favs.add(s);
             Collections.sort(favs);
             try {
@@ -211,12 +215,13 @@ public class Utilities {
                 os.writeObject(favs);
                 os.close();
                 fos.close();
-            } catch(Exception e) {
+            } catch (Exception e) {
+                Log.d("MESSAGE", e.toString());
             }
         }
     }
 
-    public static void loadFavs(Context context) {
+    private static void loadFavs(Context context) {
         try {
             FileInputStream fis = context.openFileInput("Favorites");
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -225,46 +230,114 @@ public class Utilities {
             fis.close();
             favs = f;
 
-        } catch(Exception e) {
-
+        } catch (Exception e) {
+            Log.d("MESSAGE", e.toString());
         }
     }
 
-    public static void saveStatus(Context context) {
+    private static void saveStatus(Context context) {
         try {
             FileOutputStream fos = context.openFileOutput("Stats", Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(stats);
             os.close();
             fos.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
+            Log.d("MESSAGE", e.toString());
         }
     }
 
-    public static void loadStatus(Context context) {
+    private static void loadStatus(Context context) {
         try {
             FileInputStream fis = context.openFileInput("Stats");
             ObjectInputStream is = new ObjectInputStream(fis);
             stats = (Status) is.readObject();
             is.close();
             fis.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.d("MESSAGE", e.toString());
 
         }
     }
 
-    public static void startUp(Context context) {
+    private static void grabHours(String date) throws IOException {
+        HttpURLConnection urlConnection;
+        URL url = new URL("http://menu.dining.ucla.edu/Hours/" + date);
+        urlConnection = (HttpURLConnection) url.openConnection();
+
+        InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+
+        final BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+        hours = new String[numPlaces][numTimes];
+        for (String[] s1 : hours)
+            for (String s2 : s1)
+                s2 = "idk ¯\\_(ツ)_/¯";
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            for (int place = 0; place < numPlaces; place++) {
+                String placePattern = ".*\"/Hours/" + placeURLNames[place] + "\">Hours</a>";
+                Pattern r = Pattern.compile(placePattern);
+                Matcher m = r.matcher(line);
+                if (m.matches()) {
+                    for (int time = 0; time < numTimes; time++) {
+                        while ((line = br.readLine()) != null) {
+                            String timePattern = "<span class=\"hours-range\">(.*)</span>";
+                            Pattern t = Pattern.compile(timePattern);
+                            Matcher ma = t.matcher(line.trim());
+                            if (ma.matches()) {
+                                hours[place][time] = ma.group(1);
+                                break;
+                            } else if (Pattern.compile("CLOSED").matcher(line.trim()).matches()) {
+                                hours[place][time] = "Closed :'(";
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        urlConnection.disconnect();
+    }
+
+    private static void saveHours(Context context) {
+
+        try {
+            FileOutputStream fos = context.openFileOutput("Hours", Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(hours);
+            os.close();
+            fos.close();
+        } catch (Exception e) {
+            Log.d("MESSAGE", e.toString());
+        }
+
+    }
+
+    private static void loadHours(Context context) {
+        try {
+            FileInputStream fis = context.openFileInput("Hours");
+            ObjectInputStream is = new ObjectInputStream(fis);
+            String[][] h = (String[][]) is.readObject();
+            is.close();
+            fis.close();
+            hours = h;
+
+        } catch (Exception e) {
+            Log.d("MESSAGE", e.toString());
+        }
+    }
+
+
+    static void startUp(Context context) {
         final String files[] = context.fileList();
         boolean hasStats = false;
         boolean hasFavs = false;
-        for (int i = 0; i < files.length; i++) {
-//            Log.d("MESSAGE", "HERE" + files[i]);
-            if(files[i].equals("Stats"))
-//                Log.d("MESSAGE", "HERE2");
+        for (String f : files) {
+            if (f.equals("Stats"))
                 hasStats = true;
-            if(files[i].equals("Favorites"))
-//                Log.d("MESSAGE", "HERE3");
+            if (f.equals("Favorites"))
                 hasFavs = true;
         }
 
@@ -281,45 +354,50 @@ public class Utilities {
         //**************************************************************************************
         //**************************************************************************************
         //**************************************************************************************
-        if(hasStats) {
+        if (hasStats) {
 
             loadStatus(context);
             stats.loaded = true;
-            if(stats.updateDate.equals(currentDate)) {
+            if (stats.updateDate.equals(currentDate)) {
                 loadMenu(context);
+                loadHours(context);
             } else {
                 try {
-                    if(hasInternetAccess(context)) {
+                    if (hasInternetAccess(context)) {
                         grabData(currentDate);
+                        grabHours(currentDate);
                         saveMenu(context);
+                        saveHours(context);
                         stats.updateDate = currentDate;
                     } else {
                         badInternet = true;
                     }
 
-                } catch(Exception e) {
-
+                } catch (Exception e) {
+                    Log.d("MESSAGE", e.toString());
                 }
             }
         } else {
             stats = new Status();
             stats.loaded = false;
             try {
-                if(hasInternetAccess(context)) {
+                if (hasInternetAccess(context)) {
                     grabData(currentDate);
+                    grabHours(currentDate);
                     saveMenu(context);
+                    saveHours(context);
                     stats.updateDate = currentDate;
                     saveStatus(context);
                 } else {
                     badInternet = true;
                 }
 
-            } catch(Exception e) {
-
+            } catch (Exception e) {
+                Log.d("MESSAGE", e.toString());
             }
         }
 
-        if(hasFavs) {
+        if (hasFavs) {
             loadFavs(context);
         } else {
             favs = new ArrayList<>();

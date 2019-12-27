@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment {
                         Boolean placeAdded = false;
                         for (int t = 0; t < Utilities.numTimes; t++) {
                             TextView time = new TextView(HomeFragment.this.getContext());
-                            time.setText(Utilities.timeNames[t].toUpperCase());
+                            time.setText(Utilities.timeNames[t].toUpperCase() + "  " + Utilities.hours[p][t]);
                             time.setTextSize(30);
                             Boolean timeAdded = false;
                             ArrayList<String> aMenu = Utilities.foods[p][t];
