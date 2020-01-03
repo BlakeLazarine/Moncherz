@@ -26,12 +26,12 @@
             android:title="@string/menu_feast" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Other">
         <menu>
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_manage"
-                android:title="@string/menu_send" />
+                android:title="@string/menu_settings" />
         </menu>
     </item>
 

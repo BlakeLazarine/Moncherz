@@ -1,5 +1,6 @@
 package com.example.moncherz;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
         grabThread gt = new grabThread();
         gt.start();
 
@@ -51,9 +53,30 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(final View view) {
+                if (Utilities.done) {
+                    Utilities.done = false;
+                    class refreshThread extends Thread {
+
+                        public void run() {
+                            try {
+                                Snackbar.make(view, "Refreshing", Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show();
+                                Utilities.startUp(MainActivity.this);
+                                Snackbar.make(view, "Done! Retap the sidebar option now plz", Snackbar.LENGTH_LONG)
+                                        .setAction("Action", null).show();
+
+                            } catch (Exception e) {
+                                Log.d("BIGBADERROR: ", "Could not Grab Data");
+                            }
+                        }
+                    }
+                    refreshThread rt = new refreshThread();
+                    rt.start();
+
+                } else
+                    Snackbar.make(view, "Hold your horses, I'm working!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
             }
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
