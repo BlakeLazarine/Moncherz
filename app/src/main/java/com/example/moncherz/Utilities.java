@@ -20,6 +20,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -282,6 +283,7 @@ public class Utilities {
                 Matcher m = r.matcher(line);
                 if (m.matches()) {
                     for (int time = 0; time < numTimes; time++) {
+                        Boolean completed = false;
                         while ((line = br.readLine()) != null) {
                             String timePattern = "<span class=\"hours-range\">(.*)</span>";
                             Pattern t = Pattern.compile(timePattern);
@@ -292,8 +294,15 @@ public class Utilities {
                             } else if (Pattern.compile("CLOSED").matcher(line.trim()).matches()) {
                                 hours[place][time] = "Closed :'(";
                                 break;
+                            }else if (Pattern.compile("<td colspan=\"4\" class=\"hours-closed-allday\">CLOSED</td>").matcher(line.trim()).matches()) {
+                                for (int ti = 0; ti < numTimes; ti++)
+                                    hours[place][ti] = "Closed :'(";
+                                completed = true;
+                                break;
                             }
                         }
+                        if(completed)
+                            break;
                     }
                 }
             }
@@ -330,18 +339,7 @@ public class Utilities {
     }
     static String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return "2019-12-11";//sdf.format(new Date());
-        //HEY YOU, YOU SHOULD UNCOMMENT THAT LINE ABOVE THIS ONE. IMA MAKE THIS REAL OBNOXIOUS
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
-        //**************************************************************************************
+        return sdf.format(new Date());
     }
 
 
@@ -373,6 +371,7 @@ public class Utilities {
                         saveMenu(context);
                         saveHours(context);
                         stats.updateDate = currentDate;
+                        saveStatus(context);
                     } else {
                         badInternet = true;
                     }
